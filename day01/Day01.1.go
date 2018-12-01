@@ -1,6 +1,7 @@
 package main
 
 import (
+	c "./common"
 	"io/ioutil"
 	"log"
 	"os"
@@ -8,19 +9,13 @@ import (
 	s "strings"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func init() {
 	log.SetOutput(os.Stdout)
 }
 
 func main() {
 	input, err := ioutil.ReadFile("day01/day01-input.txt")
-	check(err)
+	c.Check(err)
 
 	nums := s.Fields(string(input))
 
