@@ -1,7 +1,7 @@
 package main
 
 import (
-	c "./common"
+	c "../common"
 	"io/ioutil"
 	"log"
 	"os"
