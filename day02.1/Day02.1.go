@@ -13,7 +13,7 @@ func init() {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("day02/day02-input.txt")
+	input, err := ioutil.ReadFile("day02.1/day02.1-input.txt")
 	c.Check(err)
 
 	ids := s.Fields(string(input))
