@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	s "strings"
 )
@@ -14,7 +15,7 @@ func init() {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("day03.1/day03-input.txt")
+	input, err := ioutil.ReadFile("day03/day03-input.txt")
 	c.Check(err)
 
 	claims := readClaims(string(input))
@@ -24,7 +25,8 @@ func main() {
 		fitToCloth(parseClaim(cl), fabric)
 	}
 
-	log.Print("The ANSWER: ", findDuplicateCoverage(fabric))
+	log.Print("The 1st ANSWER: ", findDuplicateCoverage(fabric))
+	log.Print("The 2nd ANSWER: ", findUniqueCoverage(fabric))
 }
 
 func readClaims(input string) []string {
@@ -59,7 +61,7 @@ func parseClaim(input string) claim {
 
 func prepCloth(width int, height int) cloth {
 	cloth := make(cloth, height)
-	squareInches := make([]int, width*height)
+	squareInches := make([]fitting, width*height)
 
 	for i := range cloth {
 		cloth[i], squareInches = squareInches[:width], squareInches[width:]
@@ -68,12 +70,17 @@ func prepCloth(width int, height int) cloth {
 	return cloth
 }
 
-type cloth [][]int
+type fitting struct {
+	ids            []int
+	numberOfClaims int
+}
+type cloth [][]fitting
 
 func fitToCloth(cl claim, clth cloth) {
 	for j := cl.topOffset; j < cl.topOffset+cl.height; j++ {
 		for i := cl.leftOffset; i < cl.leftOffset+cl.width; i++ {
-			clth[i][j] += 1
+			clth[i][j].ids = append(clth[i][j].ids, cl.id)
+			clth[i][j].numberOfClaims += 1
 		}
 	}
 }
@@ -82,11 +89,38 @@ func findDuplicateCoverage(clth cloth) int {
 	count := 0
 	for j := 0; j < len(clth); j++ {
 		for i := 0; i < len(clth[0]); i++ {
-			if clth[j][i] > 1 {
+			if clth[j][i].numberOfClaims > 1 {
 				count++
 			}
 		}
 	}
 
 	return count
+}
+
+func findUniqueCoverage(clth cloth) []int {
+	ids := map[int]bool{}
+	for i := 1; i < 1311; i++ {
+		ids[i] = false
+	}
+
+	for j := 0; j < len(clth); j++ {
+		for i := 0; i < len(clth[0]); i++ {
+			if clth[j][i].numberOfClaims > 1 {
+				for _, id := range clth[j][i].ids {
+					ids[id] = true
+				}
+			}
+		}
+	}
+
+	var keys []int
+	for k := range ids {
+		if !ids[k] {
+			keys = append(keys, k)
+		}
+	}
+	sort.Ints(keys)
+
+	return keys
 }
